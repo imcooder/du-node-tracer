@@ -105,7 +105,7 @@ class tracer {
         this._logContainer.set(key, value);
     }
 
-    dumps() {
+    dumps(sortFun) {
         let timeRecords = this._timeContainer.getRecords();
         this._logContainer.set('all_t', timeRecords.allTime.toFixed(3));
         this._logContainer.set('self_t', timeRecords.selfTime.toFixed(3));
@@ -113,7 +113,7 @@ class tracer {
             this._logContainer.set(itemCost.label + '_t', itemCost.cost.toFixed(3));
         }
         // this._logContainer.setTag(this._name);
-        this.logger.info(this._logContainer.getLog(false));
+        this.logger.info(this._logContainer.getLog(false, sortFun));
     }
 }
 
