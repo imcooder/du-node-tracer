@@ -114,10 +114,41 @@ class tracer {
     }
 }
 
-module.exports = {
+const Service = {
     Tracer: tracer,
-    initLog: (config) => {
+    logger: null,
+    initLog: (config, defaultName) => {
         console.log('initLog:%j', config);
         log4js.configure(config);
-    }
+        let name = defaultName || 'app';
+        Service.logger = log4js.getLogger(name);
+    },
+    debug: (...args) => {
+        if (!Service.logger.level.isLessThanOrEqualTo('debug')) {
+            return;
+        }
+        Service.logger.debug(...args);
+    },
+    info: (...args) => {
+        if (!Service.logger.level.isLessThanOrEqualTo('info')) {
+            return;
+        }
+        Service.logger.info(...args);
+    },
+    warn: (...args) => {
+        if (!Service.logger.level.isLessThanOrEqualTo('warn')) {
+            return;
+        }
+        Service.logger.warn(...args);
+    },
+
+    error: (...args) => {
+        if (!Service.logger.level.isLessThanOrEqualTo('error')) {
+            return;
+        }
+        Service.logger.error(...args);
+    }    
 };
+
+
+module.exports = Service;
