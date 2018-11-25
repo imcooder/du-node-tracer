@@ -1,3 +1,7 @@
+/**
+ * @file: new tc logger for new dcs struct
+ * @author: imcooder@gmail.com 
+ */
 /* jshint esversion:6 */
 /* jshint node:true */
 'use strict';
