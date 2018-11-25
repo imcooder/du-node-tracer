@@ -124,26 +124,27 @@ const Service = {
         Service.logger = log4js.getLogger(name);
     },
     debug: (...args) => {
-        if (!Service.logger.level.isLessThanOrEqualTo('debug')) {
+
+        if (!Service.logger || !Service.logger.level.isLessThanOrEqualTo('debug')) {
             return;
         }
         Service.logger.debug(...args);
     },
     info: (...args) => {
-        if (!Service.logger.level.isLessThanOrEqualTo('info')) {
+        if (!Service.logger || !Service.logger.level.isLessThanOrEqualTo('info')) {
             return;
         }
         Service.logger.info(...args);
     },
     warn: (...args) => {
-        if (!Service.logger.level.isLessThanOrEqualTo('warn')) {
+        if (!Service.logger || !Service.logger.level.isLessThanOrEqualTo('warn')) {
             return;
         }
         Service.logger.warn(...args);
     },
 
     error: (...args) => {
-        if (!Service.logger.level.isLessThanOrEqualTo('error')) {
+        if (!Service.logger || !Service.logger.level.isLessThanOrEqualTo('error')) {
             return;
         }
         Service.logger.error(...args);
