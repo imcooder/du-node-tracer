@@ -1,6 +1,5 @@
 /* jshint esversion:6 */
 /* jshint node:true */
-
 'use strict';
 
 const log4js = require('log4js');
