@@ -1,6 +1,6 @@
 {
     "name": "du-node-tracer",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "description": "dueros node tracer",
     "author": "imcooder <imcooder@gmail.com>",
     "license": "MIT",
@@ -8,7 +8,8 @@
     "dependencies": {
         "du-node-utils": "^1.0.17",
         "lodash": "^4.17.11",
-        "log4js": "^3.0.6"
+        "log4js": "^3.0.6",
+        "sort-map": "^1.0.0"
     },
     "devDependencies": {
         "eslint": "^3.6.1"
