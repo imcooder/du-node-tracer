@@ -115,5 +115,9 @@ class tracer {
 }
 
 module.exports = {
-    Tracer: tracer
+    Tracer: tracer,
+    initLog: (config) => {
+        console.log('initLog:%j', config);
+        log4js.configure(config);
+    }
 };
