@@ -35,7 +35,7 @@ class tracer {
         this._logid = logid;
     }
     debug(format, ...args) {
-        if (!this.logger.level.isLessThanOrEqualTo('debug')) {
+        if (!this.logger || !this.logger.level.isLessThanOrEqualTo('debug')) {
             return;
         }
         format = 'logid:%s ' + format;
@@ -45,7 +45,7 @@ class tracer {
     }
 
     info(format, ...args) {
-        if (!this.logger.level.isLessThanOrEqualTo('info')) {
+        if (!this.logger || !this.logger.level.isLessThanOrEqualTo('info')) {
             return;
         }
         format = 'logid:%s ' + format;
@@ -55,7 +55,7 @@ class tracer {
     }
 
     warn(format, ...args) {
-        if (!this.logger.level.isLessThanOrEqualTo('warn')) {
+        if (!this.logger || !this.logger.level.isLessThanOrEqualTo('warn')) {
             return;
         }
         format = 'logid:%s ' + format;
@@ -65,7 +65,7 @@ class tracer {
     }
 
     error(format, ...args) {
-        if (!this.logger.level.isLessThanOrEqualTo('error')) {
+        if (!this.logger || !this.logger.level.isLessThanOrEqualTo('error')) {
             return;
         }
         format = 'logid:%s ' + format;
@@ -89,6 +89,9 @@ class tracer {
     }
 
     trace(tag, ...args) {
+        if (!this.logger || !this.logger.level.isLessThanOrEqualTo('debug')) {
+            return;
+        }
         this.logger.debug("logid:%s [%s] %j", this._logid, tag, {
             args
         });
@@ -109,7 +112,7 @@ class tracer {
         for (let itemCost of timeRecords.itemCosts) {
             this._logContainer.set(itemCost.label + '_t', itemCost.cost.toFixed(3));
         }
-        this._logContainer.setTag(this._name);
+        // this._logContainer.setTag(this._name);
         this.logger.info(this._logContainer.getLog(false));
     }
 }
