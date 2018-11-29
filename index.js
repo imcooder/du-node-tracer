@@ -15,14 +15,14 @@ const _ = require('lodash');
  * @brief 用于追踪执行流程
  */
 class tracer {
-    constructor(name = 'dlp', logid = '', defaultList = []) {
+    constructor(name = 'dlp', logid = '', defaultList = {}) {
         this._logid = logid || duUtils.makeUUID(true);
         this._logContainer = new LogContainer(this._logid);
         this._timeContainer = new TimeContainer();
         this.logger = log4js.getLogger(name);
         this._defaultKeys = defaultList;
         this._needSort = false;
-        if (this._defaultKeys && this._defaultKeys.length) {
+        if (this._defaultKeys) {
             _.each(this._defaultKeys, ((value, key) => {
                 if (value && value.default) {
                     this.gather(key, value.default);
