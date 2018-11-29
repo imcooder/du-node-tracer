@@ -10,7 +10,7 @@ const log4js = require('log4js');
 const duUtils = require('du-node-utils');
 const LogContainer = require('./lib/log_container');
 const TimeContainer = require('./lib/time_container');
-
+const _ = require('lodash');
 /*
  * @brief 用于追踪执行流程
  */
@@ -23,14 +23,14 @@ class tracer {
         this._defaultKeys = defaultList;
         this._needSort = false;
         if (this._defaultKeys && this._defaultKeys.length) {
-            this._defaultKeys.forEach(item => {
-                if (item && item.default) {
-                    this.gather(item, item.default);
-                    if (!this._needSort && item.weight) {
+            _.each(this._defaultKeys, ((value, key) => {
+                if (value && value.default) {
+                    this.gather(key, value.default);
+                    if (!this._needSort && value.weight) {
                         this._needSort = true;
                     }
                 }
-            });
+            }));
         }
     }
     static serilize(args) {
