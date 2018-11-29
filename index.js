@@ -15,20 +15,20 @@ const TimeContainer = require('./lib/time_container');
  * @brief 用于追踪执行流程
  */
 class tracer {
-    constructor(name = 'dlp', logid = '', defaultList = [], sorted = true) {
+    constructor(name = 'dlp', logid = '', defaultList = []) {
         this._logid = logid || duUtils.makeUUID(true);
         this._logContainer = new LogContainer(this._logid);
         this._timeContainer = new TimeContainer();
         this.logger = log4js.getLogger(name);
         this._defaultKeys = defaultList;
-        this._logWeight = {};
-        this._needSort = sorted;
-        let topScore = 1000;
+        this._needSort = false;
         if (this._defaultKeys && this._defaultKeys.length) {
             this._defaultKeys.forEach(item => {
-                if (item) {
-                    this._logWeight[item] = topScore --;
-                    this.gather(item, '-');
+                if (item && item.default) {
+                    this.gather(item, item.default);
+                    if (!this._needSort && item.weight) {
+                        this._needSort = true;
+                    }
                 }
             });
         }
@@ -128,8 +128,13 @@ class tracer {
         let sortFun = null;
         if (this._defaultKeys.length && this._needSort) {
             sortFun = (([k1, v1, ], [k2, v2]) => {
-                let w1 = this._logWeight[k1] || 0;
-                let w2 = this._logWeight[k2] || 0;
+                let w1 = 0, w2 = 0;
+                if (this._defaultKeys[k1] && this._defaultKeys[k1].weight) {
+                    w1 = this._defaultKeys[k1].weight;
+                }
+                if (this._defaultKeys[k2] && this._defaultKeys[k2].weight) {
+                    w1 = this._defaultKeys[k2].weight;
+                }
                 return w2 - w1;
             });
         }
