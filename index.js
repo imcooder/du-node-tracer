@@ -24,8 +24,10 @@ class tracer {
         this._needSort = false;
         if (this._defaultKeys) {
             _.each(this._defaultKeys, ((value, key) => {
-                if (value && value.default) {
-                    this.gather(key, value.default);
+                if (value) {
+                    if (_.has(value, 'default')) {
+                        this.gather(key, value.default);
+                    }
                     if (!this._needSort && value.weight) {
                         this._needSort = true;
                     }
