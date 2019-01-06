@@ -94,14 +94,18 @@ class tracer {
     tcStart(label, isSeq = false) {
         return this._timeContainer.tcStart(label, isSeq);
     }
-
+    startSequenceTimer(label) {
+        return this.tcStart(label, true);
+    }
     end(label) {
         return this._timeContainer.tcEnd(label);
     }
     tcEnd(label) {
         return this._timeContainer.tcEnd(label);
     }
-
+    stopSequenceTimer(label) {
+        return this.tcEnd(label);
+    }
     trace(tag, ...args) {
         if (!this.logger || !this.logger.level.isLessThanOrEqualTo('debug')) {
             return;
