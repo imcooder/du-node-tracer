@@ -118,9 +118,18 @@ class tracer {
     setName(name) {
         this._name = name;
     }
-
+    _makeValue(key, value) {
+        let v = value;
+        if (v !== '') {
+            return v;
+        }
+        if (this._defaultKeys[key] && this._defaultKeys[key].default) {
+            v = this._defaultKeys[key].default;
+        }
+        return v;
+    }
     gather(key, value) {
-        this._logContainer.set(key, value);
+        this._logContainer.set(key, this._makeValue(key, value));
     }
 
     dumps() {
