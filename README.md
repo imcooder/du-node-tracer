@@ -11,3 +11,29 @@ dueros node tracer
 [download-url]: https://npmjs.com/package/du-node-tracer
 [david-image]: https://img.shields.io/david/imcooder/du-node-tracer.svg
 [david-url]: https://david-dm.org/imcooder/du-node-tracer
+
+
+## usage
+init:
+let t = new tracer('dcs-utils', req.logid, [
+    {
+        key: logid,
+        default: '-'
+    },
+    {
+        key:path
+    },
+    {
+        key:request,
+    }
+]);
+
+单条打印：
+t.debug('request:%j', req.body);
+
+收集日志 最终一条输出：
+t.gather('path', req.path.toLowerCase());
+t.gather('client_ip', req.ip);
+t.gather('header', req.headers);
+t.gather('pv_lost', 0);
+t.dumps();

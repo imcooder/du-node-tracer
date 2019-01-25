@@ -168,6 +168,13 @@ class tracer {
     }
 
     _join() {
+        this._set('logid', this._logid);
+        let timeRecords = this._timeContainer.getRecords();
+        this._set('all_t', timeRecords.allTime.toFixed(3));
+        this._set('self_t', timeRecords.selfTime.toFixed(3));
+        for (let itemCost of timeRecords.itemCosts) {
+            this._set(itemCost.label + '_t', itemCost.cost.toFixed(3));
+        }
         let out = '';
         for (let i = 0; i < this._list.length; i++) {
             let item = this._list[i];
@@ -203,13 +210,6 @@ class tracer {
         return out;
     }
     dumps() {
-        this._set('logid', this._logid);
-        let timeRecords = this._timeContainer.getRecords();
-        this._set('all_t', timeRecords.allTime.toFixed(3));
-        this._set('self_t', timeRecords.selfTime.toFixed(3));
-        for (let itemCost of timeRecords.itemCosts) {
-            this._set(itemCost.label + '_t', itemCost.cost.toFixed(3));
-        }
         let out = this._join();
         this.logger.info(out);
     }
