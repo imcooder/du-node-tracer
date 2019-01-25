@@ -8,31 +8,47 @@
 
 const log4js = require('log4js');
 const duUtils = require('du-node-utils');
-const LogContainer = require('./lib/log_container');
 const TimeContainer = require('./lib/time_container');
 const _ = require('lodash');
 /*
  * @brief 用于追踪执行流程
  */
+const DEFAULT_VALUE = '-';
 class tracer {
     constructor(name = 'dlp', logid = '', defaultList = {}) {
         this._logid = logid || duUtils.makeUUID(true);
-        this._logContainer = new LogContainer(this._logid);
+        this._list = [];
+        this._map = {};
         this._timeContainer = new TimeContainer();
         this.logger = log4js.getLogger(name);
-        this._defaultKeys = defaultList;
-        this._needSort = false;
-        if (this._defaultKeys) {
-            _.each(this._defaultKeys, ((value, key) => {
-                if (value) {
-                    if (_.has(value, 'default')) {
-                        this.gather(key, value.default);
-                    }
-                    if (!this._needSort && value.weight) {
-                        this._needSort = true;
-                    }
+        if (defaultList) {
+            let arr = defaultList;
+            if (_.isObject(defaultList) && !_.isArray(defaultList)) {
+                for (let key in defaultList) {
+                    let value = defaultList[key];
+                    value.key = key;
+                    value.weight = value.weight || 0;
+                    arr.push(value);
                 }
-            }));
+                arr.sort((a, b) => {
+                    return b.weight - b.weight;
+                });
+            }
+            if (_.isArray(defaultList)) {
+                defaultList.forEach(item => {
+                    let obj = {
+                        key: item.key || '',
+                        default: item.default || '-'
+                    };
+                    if (!obj.key) {
+                        return;
+                    }
+                    if (!this._map[obj.key]) {
+                        this._list.push(obj);
+                    }
+                    this._map[obj.key] = obj;
+                });
+            }
         }
     }
     static serilize(args) {
@@ -48,6 +64,24 @@ class tracer {
     set logid(logid) {
         this._logid = logid;
     }
+    _set(key, value) {
+        let obj = this._map[key];
+        if (!obj) {
+            obj = {
+                key: key,
+                value: value || '-',
+                default: '-'
+            };
+            this._list.push(obj);
+            this._map[key] = obj;
+        }
+        obj.value = value;
+    }
+
+    _get(key) {
+        return this._map[key];
+    }
+
     debug(format, ...args) {
         if (!this.logger || !this.logger.level.isLessThanOrEqualTo('debug')) {
             return;
@@ -123,37 +157,61 @@ class tracer {
         if (v !== '') {
             return v;
         }
-        if (this._defaultKeys[key] && this._defaultKeys[key].default) {
-            v = this._defaultKeys[key].default;
+        let obj = this._get(key);
+        if (obj && obj.default !== undefined) {
+            return obj.default;
         }
-        return v;
+        return DEFAULT_VALUE;
     }
     gather(key, value) {
-        this._logContainer.set(key, this._makeValue(key, value));
+        this._set(key, this._makeValue(key, value));
     }
 
+    _join() {
+        let out = '';
+        for (let i = 0; i < this._list.length; i++) {
+            let item = this._list[i];
+            let s = '';
+            let value = item.value;
+            if (_.isString(value)) {
+                s = value;
+            } else if (value instanceof Buffer) {
+                s = value.toString();
+            } else if (_.isObject(value)) {
+                try {
+                    s = JSON.stringify(value);
+                } catch (error) {
+                    s = '';
+                }
+            } else {
+                try {
+                    s = value.toString();
+                } catch (error) {
+                    s = '';
+                }
+            }
+            if (!_.isString(s)) {
+                s = s.toString();
+            }
+            s = s.replace(/\s+/g, '_');
+            s = s.replace(/[\n ]/g, '');
+            out += ' ' + item.key + ':' + s;
+            if (i !== this._list.length - 1) {
+                out += ' ';
+            }
+        }
+        return out;
+    }
     dumps() {
+        this._set('logid', this._logid);
         let timeRecords = this._timeContainer.getRecords();
-        this._logContainer.set('all_t', timeRecords.allTime.toFixed(3));
-        this._logContainer.set('self_t', timeRecords.selfTime.toFixed(3));
+        this._set('all_t', timeRecords.allTime.toFixed(3));
+        this._set('self_t', timeRecords.selfTime.toFixed(3));
         for (let itemCost of timeRecords.itemCosts) {
-            this._logContainer.set(itemCost.label + '_t', itemCost.cost.toFixed(3));
+            this._set(itemCost.label + '_t', itemCost.cost.toFixed(3));
         }
-        // this._logContainer.setTag(this._name);
-        let sortFun = null;
-        if (this._defaultKeys.length && this._needSort) {
-            sortFun = (([k1, v1, ], [k2, v2]) => {
-                let w1 = 0, w2 = 0;
-                if (this._defaultKeys[k1] && this._defaultKeys[k1].weight) {
-                    w1 = this._defaultKeys[k1].weight;
-                }
-                if (this._defaultKeys[k2] && this._defaultKeys[k2].weight) {
-                    w1 = this._defaultKeys[k2].weight;
-                }
-                return w2 - w1;
-            });
-        }
-        this.logger.info(this._logContainer.getLog(false, sortFun));
+        let out = this._join();
+        this.logger.info(out);
     }
 }
 
@@ -191,7 +249,7 @@ const Service = {
             return;
         }
         Service.logger.error(...args);
-    }    
+    }
 };
 
 
