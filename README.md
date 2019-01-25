@@ -14,7 +14,8 @@ dueros node tracer
 
 
 ## usage
-init:
+* init: 按照顺序一条中排序
+
 let t = new tracer('dcs-utils', req.logid, [
     {
         key: logid,
@@ -28,10 +29,12 @@ let t = new tracer('dcs-utils', req.logid, [
     }
 ]);
 
-单条打印：
+* 单条打印：
+
 t.debug('request:%j', req.body);
 
-收集日志 最终一条输出：
+* 收集日志 最终一条输出：
+
 t.gather('path', req.path.toLowerCase());
 t.gather('client_ip', req.ip);
 t.gather('header', req.headers);
