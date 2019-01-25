@@ -24,6 +24,7 @@ class tracer {
         if (defaultList) {
             let arr = defaultList;
             if (_.isObject(defaultList) && !_.isArray(defaultList)) {
+                arr = [];
                 for (let key in defaultList) {
                     let value = defaultList[key];
                     value.key = key;
@@ -31,14 +32,15 @@ class tracer {
                     arr.push(value);
                 }
                 arr.sort((a, b) => {
-                    return b.weight - b.weight;
+                    return b.weight - a.weight;
                 });
             }
-            if (_.isArray(defaultList)) {
-                defaultList.forEach(item => {
+            if (_.isArray(arr)) {
+                arr.forEach(item => {
                     let obj = {
                         key: item.key || '',
-                        default: item.default || '-'
+                        default: item.default || DEFAULT_VALUE,
+                        value: item.value || item.default || DEFAULT_VALUE
                     };
                     if (!obj.key) {
                         return;
@@ -202,10 +204,10 @@ class tracer {
             }
             s = s.replace(/\s+/g, '_');
             s = s.replace(/[\n ]/g, '');
-            out += ' ' + item.key + ':' + s;
-            if (i !== this._list.length - 1) {
+            if (out) {
                 out += ' ';
             }
+            out += item.key + ':' + s;
         }
         return out;
     }
