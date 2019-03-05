@@ -15,6 +15,8 @@ dueros node tracer
 
 ## usage
 * init: 按照顺序一条中排序
+内部使用log4js配置
+tracer.initLog(require('./conf/log4js_config')[env], 'app');
 
 let t = new tracer('dcs-utils', req.logid, [
     {
@@ -40,3 +42,7 @@ t.gather('client_ip', req.ip);
 t.gather('header', req.headers);
 t.gather('pv_lost', 0);
 t.dumps();
+
+
+* global use
+tracer.debug('logid:%s request:%j', this.logid, req.body);
